@@ -275,15 +275,95 @@ hdr();go(S.user?'home':'login');
   // https://firebase.google.com/docs/web/setup#available-libraries
 
   // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyACur1P_gbtAy0naHIlvChdfG1NBsKa8y8",
-    authDomain: "proyek-tik-kelompok-4.firebaseapp.com",
-    projectId: "proyek-tik-kelompok-4",
-    storageBucket: "proyek-tik-kelompok-4.firebasestorage.app",
-    messagingSenderId: "125293848799",
-    appId: "1:125293848799:web:31cde33c338eaf79c3e16a"
-  };
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc }
+  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
+const firebaseConfig = {
+  // TEMPEL config milikmu di sini (dari baris 278-285 lama)
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Username diubah jadi email palsu. "-" tidak boleh ada di username, jadi tidak bisa bentrok.
+const toEmail = un => un.replace(/\./g, '-dot-') + '@tkj-lab.app';
+const toUser = em => em.split('@')[0].replace(/-dot-/g, '.');
+let pendingName = null;
+
+function errMsg(e) {
+  var c = (e && e.code) || '';
+  if (c === 'auth/email-already-in-use') return 'Username sudah dipakai. Coba username lain, atau masuk jika itu akunmu.';
+  if (c === 'auth/invalid-credential' || c === 'auth/user-not-found' || c === 'auth/wrong-password') return 'Username atau kata sandi salah.';
+  if (c === 'auth/operation-not-allowed') return 'Login Email/Password belum diaktifkan di Firebase.';
+  if (c === 'auth/network-request-failed') return 'Tidak ada koneksi internet.';
+  if (c === 'auth/too-many-requests') return 'Terlalu banyak percobaan. Coba lagi nanti.';
+  if (c === 'permission-denied') return 'Firestore menolak akses. Cek Rules di Firebase.';
+  return 'Terjadi kesalahan: ' + (c || e);
+}
+
+function resetState() {
+  S.user = null; S.name = ''; S.best = 0; S.dn = {}; S.sc = {}; S.m = S.s = S.q = null;
+  hdr(); go('login');
+}
+
+window.doAuth = function (ev, mode) {
+  ev.preventDefault();
+  var g = function (i) { return document.getElementById(i) };
+  authErr('');
+  var un = g('au_u').value.trim().toLowerCase(), pw = g('au_p').value;
+  if (mode === 'up') {
+    var nm = g('au_n').value.trim();
+    if (!nm) { authErr('Isi nama kamu dulu.'); return false }
+    if (!/^[a-z0-9_.]{3,20}$/.test(un)) { authErr('Username 3 sampai 20 karakter: huruf, angka, titik, atau garis bawah.'); return false }
+    if (pw.length < 6) { authErr('Kata sandi minimal 6 karakter.'); return false }
+    if (pw !== g('au_p2').value) { authErr('Konfirmasi kata sandi tidak sama.'); return false }
+    pendingName = nm;
+    createUserWithEmailAndPassword(auth, toEmail(un), pw)
+      .then(function (cred) {
+        return setDoc(doc(db, 'users', cred.user.uid), { username: un, name: nm, best: 0, dn: {} });
+      })
+      .catch(function (e) { pendingName = null; authErr(errMsg(e)); });
+  } else {
+    if (!un || !pw) { authErr('Isi username dan kata sandi.'); return false }
+    signInWithEmailAndPassword(auth, toEmail(un), pw)
+      .catch(function (e) { authErr(errMsg(e)); });
+  }
+  return false;
+};
+
+window.saveProg = function () {
+  if (!S.user || !auth.currentUser) return;
+  setDoc(doc(db, 'users', auth.currentUser.uid), {
+    username: S.user, name: S.name,
+    best: S.best || 0,
+    dn: JSON.parse(JSON.stringify(S.dn || {}))
+  }, { merge: true }).catch(function (e) { console.error(e); });
+};
+
+window.signOut = function () {
+  fbSignOut(auth).catch(function () {});
+  resetState();
+};
+
+onAuthStateChanged(auth, async function (user) {
+  if (!user) { if (S.user) resetState(); return; }
+  var d = {};
+  try {
+    var snap = await getDoc(doc(db, 'users', user.uid));
+    if (snap.exists()) d = snap.data();
+  } catch (e) { console.error(e); }
+  S.user = toUser(user.email);
+  S.name = d.name || pendingName || S.user;
+  S.best = d.best || 0;
+  S.dn = d.dn || {};
+  S.sc = {}; S.m = S.s = S.q = null;
+  pendingName = null;
+  hdr(); go('home');
+});
 </script>
+</body></html>
