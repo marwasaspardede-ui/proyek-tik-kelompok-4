@@ -268,4 +268,22 @@ R.login=function(mode){var up=mode=='up';
  var f=document.getElementById(up?'au_n':'au_u');if(f)f.focus()};
 (function(){try{var s=localStorage.getItem(AK.s),u=s&&uAll()[s];if(u){S.user=s;S.name=u.name||s;S.best=u.best||0;S.dn=u.dn||{}}}catch(e){}})();
 hdr();go(S.user?'home':'login');
-</script></body></html>
+</script></body></html> <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyACur1P_gbtAy0naHIlvChdfG1NBsKa8y8",
+    authDomain: "proyek-tik-kelompok-4.firebaseapp.com",
+    projectId: "proyek-tik-kelompok-4",
+    storageBucket: "proyek-tik-kelompok-4.firebasestorage.app",
+    messagingSenderId: "125293848799",
+    appId: "1:125293848799:web:31cde33c338eaf79c3e16a"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
