@@ -496,12 +496,12 @@ body:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;back
    Jangan masukkan private key/service account ke file ini.
    ========================================================= */
 var TKJ_FIREBASE_CONFIG={
-  apiKey:'PASTE_FIREBASE_API_KEY',
-  authDomain:'PASTE_PROJECT.firebaseapp.com',
-  projectId:'PASTE_PROJECT_ID',
-  storageBucket:'PASTE_PROJECT.firebasestorage.app',
-  messagingSenderId:'PASTE_MESSAGING_SENDER_ID',
-  appId:'PASTE_FIREBASE_APP_ID'
+  apiKey:'AIzaSyAD97vLLS1o48w78n8ciQFaPfJPIhMg0PM',
+  authDomain:'tkj-interactive-lab.firebaseapp.com',
+  projectId:'tkj-interactive-lab',
+  storageBucket:'tkj-interactive-lab.firebasestorage.app',
+  messagingSenderId:'187544208875',
+  appId:'1:187544208875:web:0e464c8f34c9a02e9cc5ae'
 };
 var TKJ_CLOUD={enabled:false,ready:false,auth:null,db:null,storage:null,app:null};
 function firebaseConfigured(){return !!(window.firebase&&TKJ_FIREBASE_CONFIG.apiKey&&TKJ_FIREBASE_CONFIG.apiKey.indexOf('PASTE_')!==0&&TKJ_FIREBASE_CONFIG.projectId&&TKJ_FIREBASE_CONFIG.projectId.indexOf('PASTE_')!==0)}
